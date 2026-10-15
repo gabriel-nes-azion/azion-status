@@ -1,0 +1,13 @@
+{
+  "name": "status-page",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal Azion account status page served by a single Azion Function",
+  "scripts": {
+    "dev": "node backend/dev.js",
+    "bundle": "node scripts/bundle.mjs",
+    "build": "npm run bundle && azion build && cp .edge/functions/index.js .edge/index.js",
+    "deploy": "npm run build && azion deploy --auto --local --skip-build --no-prompt"
+  }
+}

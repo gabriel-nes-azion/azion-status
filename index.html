@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Account Status</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+  <script>
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem("statuspage.theme"); } catch (e) {}
+      var dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.classList.add(dark ? "theme-dark" : "theme-light");
+    })();
+  </script>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <svg class="logo" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="header-title">Status</span>
+    </div>
+    <div class="header-right">
+      <div class="range" role="group" aria-label="Time range">
+        <button type="button" class="range-btn" data-range="1h" aria-pressed="true">1h</button>
+        <button type="button" class="range-btn" data-range="24h" aria-pressed="false">24h</button>
+        <button type="button" class="range-btn" data-range="7d" aria-pressed="false">7d</button>
+      </div>
+      <button type="button" class="icon-btn" id="refreshBtn" aria-label="Refresh" title="Refresh">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>
+      </button>
+      <button type="button" class="icon-btn" id="themeBtn" aria-label="Toggle theme" title="Toggle theme">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+      </button>
+      <div class="user-chip" id="userChip" hidden>
+        <span class="user-chip-name" id="chipName"></span>
+        <span class="user-chip-meta mono" id="chipClient"></span>
+      </div>
+      <div class="avatar-wrap">
+        <button type="button" class="avatar" id="avatarBtn" aria-haspopup="menu" aria-expanded="false" aria-label="Account menu" hidden>?</button>
+        <div class="menu" id="avatarMenu" role="menu" hidden>
+          <div class="menu-head">
+            <div class="menu-name" id="userName"></div>
+            <div class="menu-meta" id="userEmail"></div>
+            <div class="menu-meta mono" id="userClient"></div>
+            <div class="menu-meta" id="userSource"></div>
+          </div>
+          <button type="button" class="menu-item" id="signOutBtn" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <nav class="breadcrumb" aria-label="Breadcrumb">Account<span class="mono" id="crumbClient"></span> <span aria-hidden="true">/</span> Status</nav>
+    <h1 class="page-title">Service status</h1>
+    <p class="page-desc">Health of every application in your account, aggregated across all domains.</p>
+
+    <div id="platformAlert" class="platform-alert" aria-live="polite" hidden></div>
+
+    <section class="group" aria-labelledby="platformTitle">
+      <div class="group-head">
+        <h2 class="section-title" id="platformTitle">Azion platform</h2>
+        <span class="tag" id="platformTag" data-status="loading">Loading</span>
+        <a class="group-link" href="https://status.azion.com" target="_blank" rel="noopener">status.azion.com
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+        </a>
+      </div>
+      <div class="card history" id="platformHistory"></div>
+    </section>
+
+    <section class="banner" id="banner" data-status="loading" aria-live="polite">
+      <span class="banner-icon" id="bannerIcon"></span>
+      <div class="banner-body">
+        <div class="banner-title" id="bannerTitle">Checking your services</div>
+        <div class="banner-sub mono" id="bannerSub">Loading metrics</div>
+      </div>
+    </section>
+
+    <div id="groups"></div>
+
+  </main>
+
+  <footer class="footer">
+    <span>Azion account status</span>
+    <span class="footer-status"><span class="dot" id="footerDot"></span><span id="footerText">Loading</span></span>
+  </footer>
+
+  <div class="backdrop" id="loginModal" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+      <div class="dialog-head">
+        <h2 id="loginTitle" class="dialog-title">Sign in</h2>
+      </div>
+      <p class="dialog-desc">Use a personal token or your console session cookie. Credentials stay in this browser's local storage and are only forwarded to Azion APIs.</p>
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab" role="tab" id="tabToken" aria-selected="true" aria-controls="panelToken">Personal token</button>
+        <button type="button" class="tab" role="tab" id="tabCookie" aria-selected="false" aria-controls="panelCookie">Cookie azsid</button>
+      </div>
+      <form id="loginForm" novalidate>
+        <div class="field" id="panelToken" role="tabpanel" aria-labelledby="tabToken">
+          <label for="tokenInput" class="label">Personal token *</label>
+          <input id="tokenInput" class="input mono" type="password" autocomplete="off" spellcheck="false">
+          <div class="helper">Create one at <a href="https://console.azion.com/personal-tokens" target="_blank" rel="noopener">console.azion.com/personal-tokens</a>. Sent as <span class="mono">Authorization: Token</span>.</div>
+          <div class="error" id="tokenError" hidden></div>
+        </div>
+        <div class="field" id="panelCookie" role="tabpanel" aria-labelledby="tabCookie" hidden>
+          <label for="azsidInput" class="label">azsid cookie *</label>
+          <input id="azsidInput" class="input mono" type="password" autocomplete="off" spellcheck="false">
+          <div class="helper">In console.azion.com open DevTools, Application, Cookies, and copy the value of <span class="mono">azsid</span>.</div>
+          <div class="error" id="azsidError" hidden></div>
+        </div>
+        <div class="dialog-foot">
+          <button type="submit" class="btn btn-primary" id="loginSubmit">
+            <span class="spinner" hidden></span>
+            <span>Sign in</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="assertive"></div>
+  <div class="day-tip" id="dayTip" role="tooltip" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+.edge/
+.vulcan
+.open-next
+args.json
+azion.json
+index.js
+node_modules/
