@@ -4,6 +4,8 @@ Personal status page for an Azion account. It aggregates metrics for the whole a
 
 Plain HTML, CSS and JS front-end. A single Azion Function serves both the static files and the API.
 
+Demo available in: https://status.azion.app
+
 ## Layout
 
 | Path | Role |
@@ -80,4 +82,3 @@ npm run dev   # http://localhost:8787
 npm run deploy
 ```
 
-The project is already linked through `azion/azion.json` and `azion.config.mjs`. Current URL: https://mkcnl2ibd6u.map.azionedge.net
