@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Personal Azion account status page served by a single Azion Function",
+  "description": "Personal Azion account status page built with the Azion Community kit",
   "scripts": {
-    "dev": "node backend/dev.js",
-    "bundle": "node scripts/bundle.mjs",
-    "build": "npm run bundle && azion build && cp .edge/functions/index.js .edge/index.js",
-    "deploy": "npm run build && azion deploy --auto --local --skip-build --no-prompt"
+    "dev": "node scripts/dev.mjs",
+    "build": "azion build",
+    "deploy": "./scripts/deploy.sh"
+  },
+  "devDependencies": {
+    "azion": "^3.1.5"
   }
 }

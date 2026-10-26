@@ -1,311 +1,316 @@
-# DESIGN.md — Azion Console Design System
+# DESIGN.md — Azion Community Design System
 
-Guia visual independente de framework para reproduzir o look & feel do Azion Console em outras UIs.
+Framework-independent visual guide for Azion Community apps. It follows the Azion Console look and feel and adds the shared community header, user menu, sign-in and footer. Everything here ships as code in the kit:
+
+| File | URL |
+|---|---|
+| Stylesheet | `https://community.azion.app/kit/v1/azion-community.css` |
+| Script | `https://community.azion.app/kit/v1/azion-community.js` |
+| Function session handler | `https://community.azion.app/kit/v1/server/community-auth.js` |
+| Logo (light on dark, dark on light) | `/kit/v1/logo.svg`, `/kit/v1/logo-dark.svg` |
+| Favicon | `/kit/v1/favicon.svg` |
+| Component gallery | `https://community.azion.app/components` |
+
+Use the kit classes (`azc-*`) and tokens. Do not copy hex values into app CSS.
 
 ---
 
-## 1. Princípios
+## 1. Principles
 
-- **Flat, não skeumórfico.** Bordas sutis substituem sombras.
-- **Header sempre escuro**, conteúdo claro ou escuro conforme tema.
-- **Laranja `#F3652B`** é cor de marca — uso pontual em CTAs, hovers, indicadores ativos. Nunca para body text ou áreas extensas.
-- **Hierarquia por tamanho e cor**, não por peso pesado. Não use `font-weight ≥ 700`.
-- **Dados densos em monoespaçada** (IDs, métricas, código). UI em sans-serif.
-- **Espaçamento em múltiplos de 4px.**
+- **Flat, not skeuomorphic.** Subtle borders replace shadows.
+- **The header is always dark.** Content follows the light or dark theme.
+- **Orange `#F3652B` is the brand color.** Use it for primary CTAs, focus, hover and active indicators only. Never for body text or large areas.
+- **Hierarchy through size and color**, not heavy weight. Never use `font-weight` 700 or above.
+- **Dense data in monospace** (IDs, metrics, code). UI in sans-serif.
+- **Spacing in multiples of 4px.**
 
 ---
 
-## 2. Cores
+## 2. Colors
 
-### Marca
+### Brand
 
-| Nome | Hex | Uso |
+| Name | Hex | Use |
 |---|---|---|
-| Orange | `#F3652B` | CTA primário, foco, hover, indicador ativo |
-| Success | `#22C55E` | Check verde |
+| Orange | `#F3652B` | Primary CTA, focus, hover, active indicator |
+| Success | `#22C55E` | Green check |
 
-### Header (sempre dark, em ambos os temas)
+### Header (dark in both themes)
 
 | Token | Hex |
 |---|---|
-| Background | `#111111` |
-| Border | `#3e3e3e` |
-| Text | `#b5b5b5` |
-| Button hover | `#f5f5f516` |
-| Avatar bg | `#363636` |
+| `--header-bg` | `#111111` |
+| `--header-border` | `#3e3e3e` |
+| `--header-text` | `#b5b5b5` |
+| `--header-hover` | `#f5f5f516` |
+| `--header-avatar-bg` | `#363636` |
 
-### Semânticas (use tokens, não hex)
+### Semantic tokens
 
-Defina como CSS variables e troque por tema. Nomes a usar:
+Always use tokens. Each theme redefines them.
 
 ```
---surface-ground       background da página
---surface-section      background de cards/seções
---surface-border       borda padrão (1px)
---surface-hover        hover de linha/item
---surface-50..600      escala neutra
+--surface-ground       page background
+--surface-section      card and section background
+--surface-border       default 1px border
+--surface-hover        row and item hover
+--surface-50..600      neutral scale
 
---text-primary         texto principal
---text-secondary       descrições, metadata
---text-muted           desabilitado, placeholder
+--text-primary         main text
+--text-secondary       descriptions, metadata
+--text-muted           disabled, placeholder
 --text-link / --text-link-hover
 
 --status-success / --status-danger / --status-warning / --status-info
 ```
 
-**Light:** surfaces brancas/cinza claríssimo, texto quase preto.
-**Dark:** surface-ground ≈ `#0A0A0A`, texto `#e5e5e5`.
+- **Light:** white or near-white surfaces, near-black text.
+- **Dark:** `--surface-ground` `#0A0A0A`, text `#E5E5E5`.
 
-Toggle de tema via classe no `<html>` (`theme-light` / `theme-dark`), persistido em storage e respeitando `prefers-color-scheme`.
+The theme is a class on `<html>` (`theme-light` / `theme-dark`). The kit sets it before the first paint from `localStorage['azion.community.theme']` (`light`, `dark`, or absent for system) and follows `prefers-color-scheme` when set to system.
 
 ---
 
-## 3. Tipografia
+## 3. Typography
 
-| Família | Uso |
+| Family | Use |
 |---|---|
-| **Sora** | Toda a UI — body, títulos, botões, labels |
-| **Proto Mono** | IDs, valores numéricos, código, métricas densas |
+| **Sora** | All UI: body, titles, buttons, labels |
+| **Proto Mono** (fallback JetBrains Mono) | IDs, numbers, code, dense metrics |
 
-### Escala
+The kit stylesheet loads Sora and JetBrains Mono from Google Fonts.
 
-| Tamanho | Onde |
+| Size | Where |
 |---|---|
 | 12px | labels, metadata, captions |
-| 14px | body de UI, descrições |
-| 16px | body padrão |
-| 18px | breadcrumb, labels destacados |
-| 20px | títulos de seção |
-| 24px | título de página (H1) |
-| 28px | métricas grandes |
+| 14px | UI body, descriptions |
+| 16px | default body |
+| 18px | breadcrumb, highlighted labels |
+| 20px | section titles |
+| 24px | page title (H1) |
+| 28px | large metrics |
 
-Pesos: **400 / 500 / 600**. Hierarquia:
+Weights: **400 / 500 / 600**.
 
 ```
-Page title       24px / 500
-Section          20px / 500
-Subsection       18px / 600
-Label            14px / 500
-Description      14px / text-secondary
-Metadata         12px / mono / text-secondary
+Page title       24px / 500       h1
+Section          20px / 500       h2
+Subsection       18px / 600       h3
+Label            14px / 500       .azc-label
+Description      14px / secondary .azc-description
+Metadata         12px / mono      .azc-meta
 ```
 
 ---
 
-## 4. Espaçamento, raios e bordas
+## 4. Spacing, radius and borders
 
-**Escala base 4px:** `0, 4, 8, 12, 16, 20, 24, 32`.
-
-**Padding de página:** `16px` mobile / `32px` desktop horizontal. `12–16px` topo / `16–32px` base.
-
-**Border radius:**
-- **6px** = padrão (botões, inputs, cards pequenos)
-- **8–12px** = modais, cards grandes, áreas de destaque
-- **full** = avatars, pills, badges
-
-**Bordas:** `1px solid var(--surface-border)`. Sombras só em popovers/dropdowns (sutis). **Sem `shadow-xl/2xl`.**
+- **Scale:** `4, 8, 12, 16, 20, 24, 32` as `--space-1` to `--space-8`.
+- **Page padding:** 16px mobile, 32px desktop horizontal. 16px top, 32px bottom.
+- **Radius:** `--radius-md` 6px default (buttons, inputs, small cards). 8 to 12px for dialogs, large cards, highlighted areas. `--radius-full` for avatars, pills, tags.
+- **Borders:** `1px solid var(--surface-border)`. Shadows only on popovers and dropdowns. No large shadows.
 
 ---
 
-## 5. Layout da aplicação
+## 5. Application layout
 
 ```
-┌─────────────────────────────────────────────────┐
-│ Header (fixed, 56px, #111111)                   │
-├─────────────────────────────────────┬───────────┤
-│                                     │           │
-│ Main                                │ Sidebar   │
-│  ├─ Heading (breadcrumb + title +   │ direito   │
-│  │           descrição + ações)     │ (drawer,  │
-│  └─ Content                         │  ~512px)  │
-│                                     │           │
-│ Footer (sticky, links + status)     │           │
-└─────────────────────────────────────┴───────────┘
+┌──────────────────────────────────────────────────────────────┐
+│ [AZION] community | App name           [nav]  [avatar ▾]     │  header, fixed, 56px, #111111
+├────────────────────────────────────────────────┬─────────────┤
+│ main.azc-main                                  │ .azc-drawer │
+│  ├─ .azc-page-heading                          │ right side  │
+│  │   breadcrumb, title, description, actions   │ ~512px      │
+│  └─ content                                    │             │
+├────────────────────────────────────────────────┴─────────────┤
+│ © Azion Community · not supported by Azion       links       │  footer
+└──────────────────────────────────────────────────────────────┘
 ```
 
-- Header **fixo no topo**, 56px, dark, com logo, menu, busca/copilot, perfil.
-- Sidebar é **drawer lateral direito** (mobile = overlay, desktop = panel), largura ~512px. Não é navegação principal — guarda Copilot, Help, etc.
-- Footer sticky com copyright, links e status do sistema.
-- Conteúdo principal vive em um wrapper com padding responsivo (`16px → 32px`).
+- `body` is a flex column with `min-height: 100vh`. `main.azc-main` grows, so the footer stays at the bottom.
+- `.azc-main` is centered at `--content-max` (1280px). Add `.azc-main--full` for full-width tools such as canvases.
+- The drawer is not main navigation. It holds secondary panels (details, quick create, help).
+
+### Header (kit, do not rebuild)
+
+`AzionCommunity.init()` renders it. Left to right:
+
+| Part | Content | Behavior |
+|---|---|---|
+| Logo | Azion wordmark SVG followed by `community` in orange | Opens the disclaimer popover |
+| Pipe | `\|` in `--header-border` | |
+| App name | `appName` option | Links to `appHref` |
+| Nav | `nav` option items | Moves into the user menu below 640px |
+| Avatar | Initials when signed in, user icon otherwise | Opens the user menu |
+
+Disclaimer text, fixed for every app:
+
+> This app is maintained by an open community that builds its apps on the Azion Platform, not by Azion. This app is not supported by Azion. All of them run on Azion's computing primitives.
+
+### User menu (kit)
+
+In order:
+
+1. Account: name, email, account id and sign-in method, or "Not signed in".
+2. Azion Console link (`https://console.azion.com`).
+3. App items: the `nav` mirror on phones, then the `menu` option items.
+4. Theme: Light, Dark, System.
+5. Sign in or Sign out (hidden when `auth: false`).
+
+### Sign-in dialog (kit)
+
+Tabs: **Email** (with a TOTP step when MFA is on), **Personal token**, **azsid cookie**. The dialog posts to the app's own Function (`/api/auth/*`). Secrets never reach JavaScript storage: the Function keeps them in HttpOnly cookies. The cookie and storage names are fixed so all apps share one session:
+
+| Name | Where | Content |
+|---|---|---|
+| `azsid` | Cookie, HttpOnly | Azion Console session id |
+| `azc_pt` | Cookie, HttpOnly | Personal token |
+| `azc_rt` | Cookie, HttpOnly | Refresh JWT from email and password |
+| `azc_mfa` | Cookie, HttpOnly | MFA step token, 5 min |
+| `azion.community.session` | localStorage | `{ method, user }`, no secrets |
+| `azion.community.theme` | localStorage | `light` or `dark` |
+
+### Footer (kit)
+
+Left: `© <year> Azion Community. Built on the Azion Platform. Not maintained or supported by Azion.` Right: Community apps, Azion Console, Platform status, then `footer.repository` and `footer.links`. 12px, `--text-secondary`.
 
 ---
 
-## 6. Padrões de página
+## 6. Page patterns
 
 ### List view
 
 ```
 [Breadcrumb]
-[Title]                                      [Create ▾]
+[Title]                                      [Create]
 [Description]
 
-[Tabela com filtros, paginação server-side, frozen first column]
+[Table with filters, server-side pagination, frozen first column]
 ```
 
-- Tabela cresce verticalmente (sem scroll interno) — a página é que rola.
-- Coluna mais à direita = menu de ações (Edit, Delete).
-- Empty state = mensagem + CTA de criação.
+- The table grows vertically. The page scrolls, not the table.
+- The rightmost column holds the row actions menu (Edit, Delete).
+- Empty state: `.azc-empty` with a message and a create CTA.
 
-### Create / Edit
+### Create and edit
 
 ```
 [Breadcrumb]
 [Title]
 [Description]
 
-[Form fields agrupados por seção, com divider entre seções]
+[Fields grouped in .azc-form-section, divider between sections]
 
 ──────────────────────────────────
-[Cancel]                    [Save]   ← Action bar sticky no fundo
+[Cancel]                    [Save]   .azc-action-bar, sticky at the bottom
 ```
 
-- Edit pode ter abas no topo (Tabs) e uma "Danger zone" no final.
+- Edit pages may have `.azc-tabs` on top and an `.azc-danger-zone` at the end.
 
 ### Drawer create
 
-Para criação rápida sem mudar de rota: drawer da direita com o mesmo form, ações no rodapé do drawer.
+Quick create without leaving the route: `.azc-drawer` from the right with the same form, actions in `.azc-drawer__footer`.
 
 ---
 
-## 7. Componentes essenciais
+## 7. Components
 
-### Botões
+| Component | Classes |
+|---|---|
+| Button | `.azc-btn` + `--primary` `--secondary` `--info` `--success` `--warn` `--danger` + `--outlined` `--text` `--link` + `--small` `--large` `--icon` + `.is-loading` |
+| Field | `.azc-field` > `.azc-label` (`.azc-required`), `.azc-input` / `.azc-select` / `.azc-textarea`, `.azc-helper`, `.azc-error` |
+| Toggles | `.azc-switch`, `.azc-check` |
+| Form alert | `.azc-form-alert` |
+| Tabs | `.azc-tabs` > `.azc-tab[aria-selected]` |
+| Table | `.azc-table-wrap` > `.azc-table`, `.azc-num` for numbers |
+| Tag | `.azc-tag` + `--success` `--danger` `--warning` `--info` `--brand` |
+| Card | `.azc-card`, `.azc-card--compact`, `.azc-metric`, `.azc-meta` |
+| Dialog | `dialog.azc-dialog` (`--wide`) > `__header`, `__body`, `__footer`, `.azc-close` |
+| Drawer | `.azc-drawer[data-open]` > `__header`, `__body`, `__footer` |
+| Toast | `AzionCommunity.toast(message, { severity })` |
+| Danger zone | `.azc-danger-zone` |
+| Layout | `.azc-main`, `.azc-page-heading`, `.azc-breadcrumb`, `.azc-section`, `.azc-grid`, `.azc-stack`, `.azc-row`, `.azc-divider` |
+| Code | `.azc-code`, `.azc-inline-code`, `.azc-mono` |
+| Loading | `.azc-spinner` |
 
-**Severidades (cor):** primary · secondary · info · success · warn · danger
-**Estilos:** filled (default) · outlined · link · text
-**Tamanhos:** small (32px) · medium (40px) · large
-**Estados:** default · hover · disabled · loading (spinner substitui ícone)
+### Buttons
 
-Convenções:
-- Listas/toolbars usam `small`. Forms usam medium.
-- Ícone à esquerda do label por padrão.
-- Submits assíncronos sempre mostram loading.
-- Ação destrutiva = `danger` filled ou outlined; nunca link.
+- Severity: primary, secondary, info, success, warn, danger. Style: filled, outlined, text, link. Size: small 32px, medium 40px, large 48px.
+- Lists and toolbars use small. Forms use medium.
+- Icon left of the label.
+- Async submits always show `.is-loading`.
+- Destructive actions use danger filled or outlined, never link.
 
-### Campos de formulário
-
-Estrutura visual de cada campo:
+### Fields
 
 ```
-Label *                                ← 14px / 500
-[ input/select/textarea          ]     ← 6px radius, border surface-border
-Helper text aqui                       ← 14px / text-secondary
-Error message (quando dirty)           ← status-danger
+Label *                                14px / 500
+[ input                          ]     6px radius, --surface-border
+Helper text                            14px / --text-secondary
+Error message (after blur)             --status-danger
 ```
 
-Tipos: text, dropdown/select, textarea, password, number, multiselect, switch, radio cards.
+Validate on blur, then on every input once the field is dirty. Set `aria-invalid` and link the error with `aria-describedby`. Never use a placeholder as the label.
 
-### Tabela
+### Table
 
-- Cabeçalho com sort clicável.
-- Filtros por coluna (popover).
-- Paginação **server-side** com indicador de loading.
-- Frozen primeira coluna no scroll horizontal.
-- Tags coloridas para status (`success-green`, `danger-red`, `warning-orange`, `info-blue`).
-- Texto longo = truncar + tooltip de cópia.
-- Export CSV opcional no header da tabela.
+- Sortable headers use `aria-sort`.
+- Server-side pagination with a loading indicator.
+- First column frozen on horizontal scroll.
+- Status as tags. Long text truncated with a copy tooltip.
 
-### Dialog (modal)
+### Dialog
 
-- Largura: `max-width: 36rem` (confirmações) ou `max-width: 48rem` (forms curtos).
-- Backdrop escuro semi-transparente (~50%).
-- Padding interno `24px`.
-- Header com título + close (×).
-- Footer com botões: cancel à esquerda (outlined/text), confirm à direita (primary ou danger).
+- `max-width` 36rem for confirmations, 48rem (`--wide`) for short forms.
+- Semi-transparent backdrop. 24px padding.
+- Header: title and close. Footer: cancel on the left (outlined or text), confirm on the right (primary or danger).
 
-### Tags / badges
+### Tags
 
-- Pill (`border-radius: full`), padding `2px 8px`, 12px texto.
-- Cor de fundo derivada da cor semântica com baixa opacidade; texto na cor cheia.
+Pill, `2px 8px`, 12px text. Background is the semantic color at low opacity, text in the full color.
 
-### Toast / notificações
+### Toast
 
-Canto superior direito ou inferior. Auto-dismiss em ~5s. Cor da borda esquerda = severity.
+Top right, below the header. Auto-dismiss after 5s. Left border in the severity color.
 
 ### Danger zone
 
-Bloco no fim de páginas de edit:
-
-```
-border 1px var(--status-danger) com 50% alpha
-background var(--status-danger) com ~10% alpha
-radius 8px, padding 24px
-texto em tom avermelhado claro
-botão danger
-```
+1px border in `--status-danger` at 50% alpha, background at 10% alpha, radius 8px, padding 24px, danger button.
 
 ---
 
-## 8. Ícones
+## 8. Icons
 
-Use **um único set principal** (estilo PrimeIcons / Phosphor regular / Lucide funcionam bem). Convenções:
-
-- Tamanho herda do `font-size` do contexto.
-- 16px em texto pequeno, 20px em botão médio, 24px+ em destaque.
-- **Ícones de marca** (logos, features proprietárias) ficam em set separado para distinguir de ações genéricas.
-
-Mapeamento mental:
-- `+` criar · `lápis` editar · `lixeira` deletar · `download` exportar
-- `chevron-down` dropdown · `external-link` link externo
-- `info-circle` info · `exclamation-triangle` warning · `check-circle` success · `times-circle` error
+- One stroke icon set (Lucide style). The kit exposes `AzionCommunity.icon(name)`: `user`, `info`, `alert`, `check`, `x`, `external`, `login`, `logout`, `sun`, `moon`, `monitor`, `console`, `arrowLeft`.
+- Size follows `font-size`: 16px in small text, 20px in medium buttons, 24px+ for emphasis.
+- Brand marks (logos) stay separate from action icons.
+- Mapping: plus create, pencil edit, trash delete, download export, chevron-down dropdown, external-link external, info-circle info, triangle warning, check-circle success, x-circle error.
 
 ---
 
-## 9. Movimento
+## 9. Motion
 
-**Duração padrão: 220ms / ease-in-out** para fade, slide, expand.
-Hovers podem ser mais curtos (~150ms). Loading spinner contínuo. **Sem bouncy/elastic.** Sem parallax.
+| Effect | Value |
+|---|---|
+| Fade, slide, expand | 220ms ease-in-out (`--ease`) |
+| Hover | 150ms ease-out (`--ease-hover`) |
+| Spinner | continuous rotation |
 
-```
-fade-in / fade-out:  220ms ease-in-out
-slide-down (expand): 220ms ease-in-out
-hover:               150ms ease-out
-spinner:             rotação contínua
-```
+No bouncy or elastic easing, no parallax. `prefers-reduced-motion` disables animations.
 
 ---
 
-## 10. Acessibilidade
+## 10. Accessibility
 
-- Contraste mínimo AA em todos os textos.
-- Foco visível em todos os interativos (outline laranja `#F3652B` ou ring com a cor).
-- Labels reais em todos os campos (sem placeholder-as-label).
-- Targets clicáveis ≥ 32×32px.
-- Estados não comunicados só por cor — usar ícone + texto também.
-
----
-
-## 11. Cheatsheet (copiar e colar)
-
-```css
-:root {
-  --brand-orange: #F3652B;
-  --status-success: #22C55E;
-
-  --header-bg: #111111;
-  --header-border: #3e3e3e;
-  --header-text: #b5b5b5;
-}
-
-/* tipografia */
-font-family: 'Sora', system-ui, sans-serif;
-font-mono:   'Proto Mono', ui-monospace, monospace;
-
-/* radius */
---radius-sm: 4px;
---radius-md: 6px;   /* padrão */
---radius-lg: 12px;
---radius-full: 9999px;
-
-/* espaçamento (multiplos de 4) */
-4 8 12 16 20 24 32
-
-/* transição */
-transition: all 220ms ease-in-out;
-```
+- AA contrast for all text.
+- Visible focus on every interactive element (orange outline).
+- Real labels on every field.
+- Click targets at least 32×32px.
+- State is never conveyed by color alone: add an icon or text.
+- The kit adds a skip link to `main`, keyboard tabs (arrow keys) and Escape to close popovers.
 
 ---
 
-## 12. Resumo em uma página
+## 11. Summary
 
-> Sora em tudo. Header preto, body com tema. Laranja `#F3652B` apenas em marca/CTA/hover. Bordas em vez de sombras. Raio 6px padrão, 12px em containers grandes, full em pills. Espaçamento múltiplo de 4. Sem peso ≥ 700. Status via tokens semânticos, nunca hex. Animações 220ms ease-in-out. Forms validam no blur, com helper e erro inline. Tabelas crescem (não scrollam) e usam paginação server-side. Modais simples, action bar sticky em forms. Acessibilidade AA, foco visível, label real.
+> Use the kit: one stylesheet, one script, `AzionCommunity.init()`. Sora everywhere. Black header with Azion logo, `community`, a pipe and the app name. Orange `#F3652B` only for brand, CTA and hover. Borders instead of shadows. 6px radius by default, 12px on large containers, full on pills. Spacing in multiples of 4. No weight above 600. Status through semantic tokens, never hex. 220ms ease-in-out. Forms validate on blur with inline helper and error. Tables grow and paginate server-side. Simple dialogs, sticky action bar on forms. AA contrast, visible focus, real labels. One shared session through the `azsid`, `azc_pt` and `azc_rt` cookies.

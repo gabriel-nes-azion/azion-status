@@ -2,7 +2,7 @@
 
 Personal status page for an Azion account. It aggregates metrics for the whole account, across every domain, and reports whether services are operational, degraded or down.
 
-Plain HTML, CSS and JS front-end. A single Azion Function serves both the static files and the API.
+Plain HTML, CSS and JS front-end built on the [Azion Community kit](https://community.azion.app), which provides the header, user menu, sign-in, theme and footer. Styles follow `DESIGN.md`. Static files are served from Azion Storage and an Azion Function answers `/api/*`.
 
 Demo available in: https://status.azion.app
 
@@ -10,30 +10,26 @@ Demo available in: https://status.azion.app
 
 | Path | Role |
 |---|---|
-| `index.html`, `styles.css`, `app.js` | Front-end, built from `DESIGN.md` |
-| `backend/worker.js` | Function entry: routing, auth, `/api/*` |
-| `backend/queries.js` | GraphQL queries for `https://api.azion.com/v4/metrics/graphql` |
-| `backend/health.js` | Indicators, thresholds and overall status |
-| `backend/dev.js` | Local Node server |
-| `backend/platform.js` | `status.azion.com` incidents, maintenances and 90-day history |
-| `scripts/bundle.mjs` | Inlines the backend modules and static files into `./index.js` |
+| `public/index.html`, `public/app.js`, `public/app.css` | Front-end, served from Storage |
+| `src/functions/main.js` | Function entry: routes `/api/auth/*` to the kit session handler, then the app routes |
+| `src/functions/community-auth.js` | Kit session handler, copied from the kit. Do not edit |
+| `src/functions/status.js` | Runs the metrics queries and builds the account report |
+| `src/functions/queries.js` | GraphQL queries for `https://api.azion.com/v4/metrics/graphql` |
+| `src/functions/health.js` | Indicators, thresholds and overall status |
+| `src/functions/platform.js` | `status.azion.com` incidents, maintenances and 90-day history |
+| `scripts/dev.mjs` | Local Node server |
+| `scripts/deploy.sh` | Deploys with the Azion CLI and purges the cache |
 
 ## API
 
 | Endpoint | Response |
 |---|---|
-| `GET /api/session` | `{ name, email, account, source }` from `sso.azion.com/api/user/me`, or `401` |
-| `GET /api/status?range=1h\|24h\|7d` | `{ overall, range, window, updatedAt, indicators[], breakdown[] }` |
+| `GET /api/auth/session`, `POST /api/auth/{login,mfa,token,azsid,logout}` | Kit session contract, see https://community.azion.app |
+| `GET /api/status?range=1h\|24h\|7d` | `{ overall, range, window, updatedAt, groups[] }`, or `401` without a session |
 | `GET /api/platform` | Azion platform status from `status.azion.com` (no auth): current indicator, open incidents, active and next 7 days maintenances, affected components, 90-day history per component group |
-| `GET /health` | `{ ok, ts }` |
+| `GET /api/health` | `{ ok, ts }` |
 
-Credentials are checked in this order:
-
-1. `Authorization: Token <personal token>`
-2. `X-Azsid: <value>`
-3. The request's own `azsid` cookie
-
-The cookie is only sent when the app is served from a subdomain of `azion.com`. On `*.azionedge.net` / `*.azion.app`, paste the cookie value into the login dialog instead. Credentials pasted into the dialog stay in the browser's `localStorage`. The function forwards them to Azion and never stores them.
+Sign-in uses the kit dialog (email with MFA, Personal token or `azsid` cookie). The Function keeps the credential in HttpOnly cookies (`azsid`, `azc_pt`, `azc_rt`) shared by every Azion Community app, and the browser never sees it. `/api/status` authenticates each metrics query with those cookies.
 
 ## Indicators
 
@@ -68,11 +64,12 @@ Each product gets the worst status of its indicators. The overall status is the 
 
 - Open incidents, active or upcoming maintenances, and non-operational components show as alerts at the top of the page.
 - A PoP in an `Edge Network` group with `partial_outage` is treated as re-routed, which is routine traffic steering, the same way the custom script on status.azion.com shows it. It is listed as a note on the platform card, not as an alert. When nothing else is degraded and no incident is open, a `minor` page indicator is reported as `All Systems Operational`.
-- The 90-day bars mark each UTC day touched by an incident with the worst impact of that day. Green means none, yellow minor, red major or critical, blue maintenance. Component groups are derived from the incident components.
+- The 90-day bars mark each UTC day touched by an incident with the worst impact of that day. Green means none, orange minor, red major or critical, blue maintenance. Component groups are derived from the incident components.
 
 ## Run locally
 
 ```sh
+npm install
 npm run dev   # http://localhost:8787
 ```
 
@@ -82,3 +79,4 @@ npm run dev   # http://localhost:8787
 npm run deploy
 ```
 
+See the `azion-community-deploy` skill for the first deploy and the bucket alignment step.
